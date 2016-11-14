@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0">
+    <title>Weather App</title>
+    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700,inherit,400" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/standardize.css">
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/jquery-3.1.1.js"></script>
+    <script src="js/weather.js"></script>
+</head>
+
+<body class="body page-index">
+
+<!-- Weather App-->
+<div class="container clearfix">
+    <p class="location"></p>
+    <p class="temperature"></p>
+    <div class="climate_bg"></div>
+    <div class="info_bg">
+        <img class="dropicon" src="images/Droplet.svg">
+        <p class="humidity"></p>
+
+        <img class="windicon" src="images/Wind.svg">
+        <div class="windspeed"></div>
+    </div>
+</div>
+<!--End of Weather App-->
+
+
+
+<script>
+    $(document).ready(function(){
+        var count = 0;
+        var images = ["images/beijing.png","images/weather-1.png","images/weather-2.png"];
+        var image = $("body");
+
+        image.css("background-image","url("+images[count]+")");
+
+        setInterval(function(){
+            image.fadeOut(500,function(){
+                image.css("background-image","url("+images[count++]+")");
+                image.fadeIn(1000);
+            });
+            if(count == images.length)
+            {
+                count = 0;
+            }
+        },5000);
+    });
+
+    if("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(function(position){
+            loadWeather(position.coords.latitude + ',' + position.coords.longitude);
+        });
+    }   else {
+        loadWeather("Beijing, CN", " ");
+    }
+
+    $(document).ready(function() {
+        setInterval(getWeather,10000);
+    });
+
+    function loadWeather(location, woeid) {
+        $.simpleWeather({
+            location: location,
+            woeid: woeid,
+            unit: 'C',
+            success: function(weather) {
+                city = weather.city;
+                temp = weather.temp+'&deg;';
+                wcode = '<img class="weathericon" src="images/weathericons/' + weather.code + '.svg">';
+                wind = '<p>' + weather.wind.speed + '</p><p>' + weather.units.speed + '</p>';
+                humidity = weather.humidity + ' %';
+                $(".location").text(city);
+                $(".temperature").html(temp);
+                $(".climate_bg").html(wcode);
+                $(".windspeed").html(wind);
+                $(".humidity").text(humidity);
+            },
+            error: function(error) {
+                $(error).html('<p>' + error + '</p>');
+            }
+        });
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.simpleWeather/3.1.0/jquery.simpleWeather.min.js"></script>
+<script src="js/weather.js"></script>
+</body>
+</html>
